@@ -1,0 +1,17 @@
+{
+    "team": "data_analysts",
+    "timestamp": "2025-05-10 05:09:58",
+    "content_length": 931,
+    "transcript_file": "transcription.txt",
+    "meeting_date": "2025-05-09 17:29",
+    "title": "Model Integration Discussion Date: 2025-05-09 ## Key Information: * Discussion of integrating the model into a single system. * Exploration of app compatibility and readability of the files. * Consideration of adding extra tables and device support to the output. * Importance of improving script functionality and versatility. * Enhancements to make the script visually appealing. ## Action Items: * No explicit action items are listed in the transcript. Further investigation is needed to determine if any actions were implied. ## Decisions: * No explicit decisions were made in the meeting. The discussion was focused on future considerations and possible improvements. ## Summary: The meeting focused on strategies for integrating a model into the existing system, enhancing its readability, and improving overall functionality and visual appeal. Further discussion is needed to determine specific action items and decisions.",
+    "key_information": [
+        "Discussion of integrating the model into a single system. * Exploration of app compatibility and readability of the files. * Consideration of adding extra tables and device support to the output. * Importance of improving script functionality and versatility. * Enhancements to make the script visually appealing."
+    ],
+    "action_items": [
+        "No explicit action items are listed in the transcript. Further investigation is needed to determine if any actions were implied."
+    ],
+    "decisions": [
+        "No explicit decisions were made in the meeting. The discussion was focused on future considerations and possible improvements."
+    ]
+}

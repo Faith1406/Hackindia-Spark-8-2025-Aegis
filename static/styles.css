@@ -1,0 +1,203 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #1e1e1e;
+    color: white;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid #4b0082;
+    border-radius: 8px;
+}
+
+h1 {
+    color: #00bfff;
+    text-align: center;
+    font-size: 1.8rem;
+    border-bottom: 1px solid #4b0082;
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.team-info, .command-help {
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid #4b0082;
+}
+
+.chat-container {
+    border: 1px solid #4b0082;
+    border-radius: 8px;
+    padding: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.response-area {
+    height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #4b0082;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.message {
+    margin-bottom: 10px;
+    padding: 1rem;
+    border-radius: 6px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.message.user {
+    background-color: rgba(75, 0, 130, 0.3);
+    margin-left: 20%;
+    border-left: 3px solid #00bfff;
+}
+
+.message.assistant {
+    background-color: rgba(0, 191, 255, 0.2);
+    margin-right: 20%;
+    border-left: 3px solid #4b0082;
+}
+
+.message.system {
+    background-color: rgba(255, 255, 255, 0.1);
+    font-style: italic;
+    border-left: 3px solid #888;
+}
+
+.message.error {
+    background-color: rgba(198, 40, 40, 0.2);
+    color: #ff6b6b;
+    border-left: 3px solid #c62828;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+#user-input {
+    flex-grow: 1;
+    padding: 0.6rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid #4b0082;
+    border-radius: 4px;
+}
+
+button {
+    padding: 0.6rem 1.2rem;
+    background-color: #00bfff;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: #00a8e0;
+    transform: translateY(-2px);
+}
+
+code {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #00bfff;
+}
+
+.log-files {
+    margin-top: 30px;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #4b0082;
+}
+
+.log-files ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.log-files li {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+}
+
+.log-files li:last-child {
+    border-bottom: none;
+}
+
+.log-files a {
+    color: #00bfff;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.log-files a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+.log-content {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 1.5rem;
+    border: 1px solid #4b0082;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.log-content pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: monospace;
+    color: #ccc;
+}
+
+/* Added from reference stylesheet */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #4b0082;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #00bfff;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

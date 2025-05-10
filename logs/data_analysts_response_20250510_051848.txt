@@ -1,0 +1,1 @@
+Please provide the system data you would like summaries of.  I need the data to create summaries.  Knowing the context of the previous "summaries" request would also be helpful.  For example, were you referring to specific meeting transcripts, or system logs, or something else entirely?

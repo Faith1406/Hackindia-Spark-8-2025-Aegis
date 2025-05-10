@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Meeting Assistant</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .action-buttons {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-buttons button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        
+        .action-buttons button:hover {
+            background-color: #45a049;
+        }
+        
+        .action-buttons button.secondary {
+            background-color: #008CBA;
+        }
+        
+        .action-buttons button.secondary:hover {
+            background-color: #007aa3;
+        }
+        
+        .action-buttons a.button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #9c27b0;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .action-buttons a.button:hover {
+            background-color: #7B1FA2;
+        }
+    </style>
+    <script 
+    src="https://static.soulmachines.com/widget-snippet-1.12.0.min.js"
+    data-sm-api-key="{{ soul_machines_api_key }}"
+    ></script>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Meeting Assistant</h1>
+        
+        <div class="team-info">
+            <h2>Available Teams</h2>
+            <ul>
+                <li><strong>Coordinator Team</strong>: Main system coordination</li>
+                <li><strong>Virtual Assistant Team</strong>: User interaction</li>
+                <li><strong>Data Analysts Team</strong>: Data processing and analysis</li>
+                <li><strong>Watchdog Team</strong>: System monitoring</li>
+            </ul>
+        </div>
+        
+        <div class="command-help">
+            <h3>How to use:</h3>
+            <p>Prefix your command with the team name:</p>
+            <ul>
+                <li><code>va: [text]</code> - Virtual Assistant Team</li>
+                <li><code>data: summarize</code> - Summarize latest transcript</li>
+                <li><code>data: minutes</code> - Generate minutes for latest transcript</li>
+                <li><code>data: [text]</code> - Data Analysts Team</li>
+                <li><code>check</code> - System status check</li>
+                <li>Any other input goes to Coordinator Team</li>
+            </ul>
+        </div>
+        
+        <!-- New section for transcript actions -->
+        <div class="action-buttons">
+            <a href="http://localhost:3000" target="_blank" class="button">Open Transcription App</a>
+            <button id="process-transcript-btn">Process Latest Transcript</button>
+        </div>
+        
+        <div class="chat-container">
+            <div id="response-area" class="response-area"></div>
+            
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Enter your request...">
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+
+    <script>
+        document.getElementById('send-button').addEventListener('click', sendRequest);
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendRequest();
+            }
+        });
+
+        // Add event listener for the new button
+        document.getElementById('process-transcript-btn').addEventListener('click', processTranscriptWithNotion);
+
+        function processTranscriptWithNotion() {
+            addMessage('system', 'Processing transcript and creating Notion page...');
+            
+            fetch('/process_live_transcript', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to process transcript');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    addMessage('error', data.error);
+                } else {
+                    addMessage('assistant', data.response);
+                }
+            })
+            .catch(error => {
+                addMessage('error', `Error processing transcript: ${error.message}`);
+                console.error('Error:', error);
+            });
+        }
+
+        function sendRequest() {
+            const userInput = document.getElementById('user-input').value;
+            if (!userInput.trim()) return;
+            
+            // Add user message to response area
+            addMessage('user', userInput);
+            
+            // Clear input
+            document.getElementById('user-input').value = '';
+            
+            // Show loading indicator
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message system';
+            loadingDiv.textContent = 'Processing...';
+            document.getElementById('response-area').appendChild(loadingDiv);
+            document.getElementById('response-area').scrollTop = document.getElementById('response-area').scrollHeight;
+            
+            // Send request to server
+            fetch('/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `user_input=${encodeURIComponent(userInput)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Remove loading indicator
+                document.getElementById('response-area').removeChild(loadingDiv);
+                
+                if (data.error) {
+                    addMessage('error', data.error);
+                } else {
+                    addMessage('assistant', data.response);
+                }
+            })
+            .catch(error => {
+                document.getElementById('response-area').removeChild(loadingDiv);
+                addMessage('error', 'Error communicating with server');
+                console.error('Error:', error);
+            });
+        }
+        
+        function addMessage(sender, content) {
+            const responseArea = document.getElementById('response-area');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            // Handle HTML content (for responses with line breaks)
+            if (content.includes('<br>')) {
+                messageDiv.innerHTML = content;
+            } else {
+                // Text content (escape to prevent XSS)
+                const textNode = document.createTextNode(content);
+                messageDiv.appendChild(textNode);
+            }
+            
+            responseArea.appendChild(messageDiv);
+            responseArea.scrollTop = responseArea.scrollHeight;
+        }
+
+        function handleNotionIntegration(data) {
+            if (data.send_to_notion) {
+                // Show a message that we're sending to Notion
+                const notionStatusDiv = document.createElement('div');
+                notionStatusDiv.className = 'notion-status';
+                notionStatusDiv.innerHTML = 'Sending to Notion...';
+                document.getElementById('response-container').appendChild(notionStatusDiv);
+                
+                // Make AJAX call to send to Notion
+                const notionData = {
+                    file_name: data.file_name // This might be null for latest file
+                };
+                
+                fetch('/send_to_notion', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(notionData),
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.error) {
+                        notionStatusDiv.innerHTML = `Failed to send to Notion: ${result.error}`;
+                        notionStatusDiv.style.color = 'red';
+                    } else {
+                        if (result.url) {
+                            notionStatusDiv.innerHTML = `<p>Sent to Notion successfully! <a href="${result.url}" target="_blank">View in Notion</a></p>`;
+                        } else {
+                            notionStatusDiv.innerHTML = 'Sent to Notion successfully!';
+                        }
+                        notionStatusDiv.style.color = 'green';
+                    }
+                })
+                .catch(error => {
+                    notionStatusDiv.innerHTML = `Error: ${error.message}`;
+                    notionStatusDiv.style.color = 'red';
+                });
+            }
+        }
+    </script>
+</body>
+</html>

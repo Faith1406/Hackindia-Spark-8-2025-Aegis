@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Transcription with Speaker Recognition</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .integration-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .integration-button {
+            background-color: #9c27b0;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        .integration-button:hover {
+            background-color: #7B1FA2;
+        }
+        
+        .integration-button i {
+            margin-right: 8px;
+        }
+    </style>
+    <!-- Add Soul Machines widget script -->
+    <script
+       src="https://static.soulmachines.com/widget-snippet-1.12.0.min.js"
+       data-sm-api-key="YOUR_API_KEY"
+    ></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Smart Transcription</h1>
+            <div class="control-buttons">
+                <button id="startBtn" class="btn btn-start">Start</button>
+                <button id="stopBtn" class="btn btn-stop" disabled>Stop</button>
+                <button id="downloadBtn" class="btn btn-download" disabled>Download Transcript</button>
+            </div>
+        </header>
+        
+        <main>
+            <div class="settings-panel">
+                <div class="threshold-controls">
+                    <div class="threshold-control">
+                        <label for="micThreshold" class="mic-color">
+                            <i class="fas fa-microphone"></i> Mic Threshold: <span id="micThresholdValue">0.005</span>
+                        </label>
+                        <input type="range" id="micThreshold" min="0.001" max="0.05" step="0.001" value="0.005">
+                        <div class="setting-description">
+                            Adjusts sensitivity for your voice (lower is more sensitive)
+                        </div>
+                    </div>
+                    
+                    <div class="threshold-control">
+                        <label for="speakerThreshold" class="speaker-color">
+                            <i class="fas fa-volume-up"></i> Speaker Threshold: <span id="speakerThresholdValue">0.01</span>
+                        </label>
+                        <input type="range" id="speakerThreshold" min="0.001" max="0.05" step="0.001" value="0.01">
+                        <div class="setting-description">
+                            Adjusts sensitivity for computer audio (lower is more sensitive)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="status-indicator">
+                <div id="statusDot"></div>
+                <span id="statusText">Inactive</span>
+            </div>
+            
+            <div class="transcription-container">
+                <h2>Transcribed Conversation</h2>
+                <div class="legend">
+                    <!-- Speaker legend will be dynamically populated -->
+                </div>
+                <div id="chunks-container"></div>
+            </div>
+
+            
+            <!-- New Integration Section -->
+            <div class="integration-section">
+                <h3>Process with Meeting Assistant</h3>
+                <p>Send this transcript to the Meeting Assistant for summarization and Notion integration.</p>
+                <button id="processWithAssistantBtn" class="integration-button">
+                    <i class="fas fa-file-export"></i> Process with Meeting Assistant
+                </button>
+            </div>
+            
+            <!-- Hidden audio player that will be controlled by buttons -->
+            <audio id="audioPlayer" style="display: none;"></audio>
+        </main>
+        
+        <footer>
+            <div class="info-panel">
+                <div class="info-title">Speaker Recognition</div>
+                <div class="info-content">
+                    This system automatically identifies and remembers different speakers in your audio.
+                    Each speaker is assigned a unique color and label for easy tracking throughout the conversation.
+                    All transcribed content is saved to a single chronological transcript file.
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+        // Add the integration button functionality
+        document.getElementById('processWithAssistantBtn').addEventListener('click', function() {
+            // Disable the button during processing
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            // Get the current transcript data
+            fetch('/api/transcript')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.transcript || !data.file_path) {
+                        alert('No transcript available to process.');
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-file-export"></i> Process with Meeting Assistant';
+                        return;
+                    }
+                    
+                    // Send to the main app for processing
+                    fetch('http://localhost:5000/process_live_transcript', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            transcript_content: data.transcript,
+                            file_path: data.file_path
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.error) {
+                            alert('Error: ' + result.error);
+                        } else {
+                            // Redirect to the main app
+                            window.location.href = 'http://localhost:5000/?processed=true';
+                        }
+                    })
+                    .catch(error => {
+                        alert('Error connecting to Meeting Assistant: ' + error.message);
+                        console.error('Error:', error);
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-file-export"></i> Process with Meeting Assistant';
+                    });
+                })
+                .catch(error => {
+                    alert('Error fetching transcript: ' + error.message);
+                    console.error('Error:', error);
+                    this.disabled = false;
+                    this.innerHTML = '<i class="fas fa-file-export"></i> Process with Meeting Assistant';
+                });
+        });
+    </script>
+</body>
+</html>
