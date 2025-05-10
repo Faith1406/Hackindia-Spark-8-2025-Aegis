@@ -46,8 +46,11 @@ class TranscriptionSession:
         # Combined transcript
         self.combined_transcript = []  # List of (timestamp, speaker, text) tuples for sorting
         
-        # Transcript files - now we'll have just one combined file
-        self.combined_transcript_file = f"transcript_{self.session_id}.txt"
+        # FIXED FILE PATH: Always use the same file name in the transcriptions directory
+        self.combined_transcript_file = "transcriptions/transcription.txt"
+        
+        # Ensure the transcriptions directory exists
+        os.makedirs("transcriptions", exist_ok=True)
         
         # Create temp directory for this session
         os.makedirs(self.temp_dir, exist_ok=True)
@@ -58,7 +61,7 @@ class TranscriptionSession:
         # Initialize the speaker diarizer
         self.speaker_diarizer = SpeakerDiarizer(self.session_id)
         
-        # Initialize transcript file with header
+        # Initialize transcript file with header - ALWAYS OVERWRITE existing file
         timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
         
         with open(self.combined_transcript_file, "w", encoding="utf-8") as f:

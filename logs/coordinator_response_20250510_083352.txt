@@ -1,0 +1,17 @@
+<think>
+Okay, so I need to figure out how to respond to this user message where they just said "hello" again after another "hello". The team members are Admin and Sub-Admin, both part of the Leadership Team. 
+
+First, looking at their instructions, the role is to coordinate all system operations as the Principal and Backup. So, I should address them properly.
+
+The previous response was from Admin, so this is a follow-up. Since they said "hello" again, maybe they just want a friendly acknowledgment without any specific action needed yet.
+
+I need to make sure not to use function calls or transfer tasks but directly answer. Also, the instructions mention remembering past conversations and maintaining context. So, I should acknowledge their previous message and perhaps invite them to ask for help if they have something specific in mind.
+
+Also, from the how_to_respond section, it's empty right now, so that's where I'll place my response. I need to structure this properly using markdown as per additional information.
+
+So, putting it all together, a simple reply acknowledging their greeting and inviting further questions should suffice.
+</think>
+
+**Response:**
+
+Hello! How can I assist you today?

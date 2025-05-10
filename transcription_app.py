@@ -35,17 +35,13 @@ def process_to_main():
                 "transcript_path": transcript_path
             })
         else:
-            # Try to find most recent transcript file
-            transcript_files = [f for f in os.listdir('.') if f.startswith('transcript_') and f.endswith('.txt')]
-            if transcript_files:
-                # Sort by modification time (newest first)
-                transcript_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
-                latest_file = transcript_files[0]
-                
+            # Use the fixed transcript file path
+            fixed_transcript_path = "transcriptions/transcription.txt"
+            if os.path.exists(fixed_transcript_path):
                 return jsonify({
                     "success": True, 
                     "redirect_url": "http://localhost:5000/",
-                    "transcript_path": latest_file
+                    "transcript_path": fixed_transcript_path
                 })
             
             return jsonify({"success": False, "error": "No active session or transcript file"})
@@ -56,7 +52,7 @@ def process_to_main():
 @app.route('/download/<path:filepath>')
 def download_file(filepath):
     # Security check - only allow downloading transcript files
-    if not filepath.startswith("transcript_") and not os.path.basename(filepath).startswith("transcript_"):
+    if not filepath.startswith("transcript_") and not os.path.basename(filepath).startswith("transcript_") and filepath != "transcriptions/transcription.txt":
         abort(403)  # Forbidden
     
     if os.path.exists(filepath):
@@ -152,33 +148,30 @@ def set_speaker_threshold():
 @app.route('/api/transcript', methods=['GET'])
 def get_transcript():
     """Get the complete combined transcript"""
+    fixed_transcript_path = "transcriptions/transcription.txt"
+    
     if active_session:
         return jsonify({
             "transcript": active_session.get_combined_transcript(),
-            "file_path": active_session.get_transcript_file_path()
+            "file_path": fixed_transcript_path
         })
     else:
-        # Try to find most recent transcript file
-        transcript_files = [f for f in os.listdir('.') if f.startswith('transcript_') and f.endswith('.txt')]
-        if transcript_files:
-            # Sort by modification time (newest first)
-            transcript_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
-            latest_file = transcript_files[0]
-            
+        # Check if the fixed transcript file exists
+        if os.path.exists(fixed_transcript_path):
             try:
-                with open(latest_file, 'r', encoding='utf-8') as f:
+                with open(fixed_transcript_path, 'r', encoding='utf-8') as f:
                     transcript_content = f.read()
                 
                 return jsonify({
                     "transcript": transcript_content,
-                    "file_path": latest_file
+                    "file_path": fixed_transcript_path
                 })
             except Exception as e:
                 log_message(f"Error reading transcript file: {e}")
         
         return jsonify({
             "transcript": "",
-            "file_path": None
+            "file_path": fixed_transcript_path  # Still return the path even if empty
         })
 
 if __name__ == '__main__':

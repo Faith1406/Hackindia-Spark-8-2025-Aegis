@@ -47,22 +47,15 @@ def fetch_latest_transcript_from_transcription_app():
         return None, None
 
 def get_latest_transcript_file():
-    """Get the latest transcript file from the transcriptions directory."""
-    transcript_dir = os.getenv("TRANSCRIPTION_DIRECTORIES", "transcriptions")
-    # If comma-separated, use the first directory
-    if "," in transcript_dir:
-        transcript_dir = transcript_dir.split(",")[0].strip()
+    """Get the fixed transcript file from the transcriptions directory."""
+    fixed_transcript_path = "transcriptions/transcription.txt"
     
-    files = glob.glob(os.path.join(transcript_dir, "*.txt"))
-    
-    if not files:
-        print("No transcription files found.")
+    if os.path.exists(fixed_transcript_path):
+        print(f"Using fixed transcript file: {fixed_transcript_path}")
+        return fixed_transcript_path
+    else:
+        print("No transcription file found.")
         return None
-    
-    # Sort by modification time (newest first)
-    latest_file = max(files, key=os.path.getmtime)
-    print(f"Found latest transcript: {os.path.basename(latest_file)}")
-    return latest_file
 
 @app.route('/process_live_transcript', methods=['POST'])
 def process_live_transcript():

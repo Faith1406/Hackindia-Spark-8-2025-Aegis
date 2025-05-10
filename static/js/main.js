@@ -15,7 +15,7 @@ let micThresholdSlider;
 let speakerThresholdSlider;
 let micThresholdValue;
 let speakerThresholdValue;
-let transcriptFilePath = null;
+let transcriptFilePath = "transcriptions/transcription.txt";  // Fixed path
 
 // Store speaker colors for consistent UI
 const speakerColors = {};
@@ -84,7 +84,7 @@ const updateUIState = (recording) => {
     // Update buttons
     startBtn.disabled = recording;
     stopBtn.disabled = !recording;
-    downloadBtn.disabled = recording || !transcriptFilePath;
+    downloadBtn.disabled = recording;
     
     // Update status indicator
     if (recording) {
@@ -98,7 +98,6 @@ const updateUIState = (recording) => {
     }
 };
 
-// Functions for recording control
 const startRecording = async () => {
     try {
         const response = await fetch('/api/start', {
@@ -121,9 +120,6 @@ const startRecording = async () => {
                     delete speakerColors[key];
                 }
             });
-            
-            // Clear transcript path
-            transcriptFilePath = null;
             
             // Clear previous conversation
             chunksContainer.innerHTML = '';
@@ -148,35 +144,22 @@ const stopRecording = async () => {
             updateUIState(false);
             stopPolling();
             
-            // Get transcript info for download
-            getTranscriptInfo();
+            // Enable download button for fixed transcript file
+            downloadBtn.disabled = false;
         }
     } catch (error) {
         console.error('Error stopping recording:', error);
     }
 };
 
-const getTranscriptInfo = async () => {
-    try {
-        const response = await fetch('/api/transcript');
-        const data = await response.json();
-        
-        if (data.file_path) {
-            transcriptFilePath = data.file_path;
-            downloadBtn.disabled = false;
-        }
-    } catch (error) {
-        console.error('Error getting transcript info:', error);
-    }
-};
-
 const downloadTranscript = () => {
-    if (!transcriptFilePath) return;
+    // Use the fixed transcript path
+    const transcriptPath = "transcriptions/transcription.txt";
     
     // Create a temporary link to download the file
     const a = document.createElement('a');
-    a.href = `/download/${transcriptFilePath}`;
-    a.download = transcriptFilePath.split('/').pop() || 'transcript.txt';
+    a.href = `/download/${transcriptPath}`;
+    a.download = 'transcription.txt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -419,8 +402,8 @@ const checkStatus = async () => {
             startPolling();
         } else {
             updateUIState(false);
-            // Try to get transcript info for download button
-            getTranscriptInfo();
+            // Since we have a fixed transcript file, the download button should be enabled by default
+            downloadBtn.disabled = false;
         }
     } catch (error) {
         console.error('Error checking status:', error);
